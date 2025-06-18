@@ -31,7 +31,17 @@ else:
 
     st.header(f"📰 Notícias do {nome_site}")
     df = pd.read_csv(f'noticias_{nome_arquivo}_dataframe.csv')
-    st.dataframe(df)
+
+# Cria link clicável em HTML
+def transformar_em_link(row):
+    return f'<a href="{row["Link"]}" target="_blank">{row["Título"]}</a>'
+
+df['Título com Link'] = df.apply(transformar_em_link, axis=1)
+
+# Mostra a tabela com link
+st.write("Clique no título para acessar a notícia:")
+st.write(df[['Título com Link', 'Seção', 'Data']].to_html(escape=False, index=False), unsafe_allow_html=True)
+
 
     st.subheader("☁️ Nuvem de Palavras")
     st.image(f'nuvem_{nome_arquivo}.png')
