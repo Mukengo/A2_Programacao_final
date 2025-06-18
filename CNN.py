@@ -2,11 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
-import csv
 
-# Lista de seções principais
 secoes = [
-    'https://www.cnnbrasil.com.br',
+    'https://www.cnnbrasil.com.br/',
     'https://www.cnnbrasil.com.br/politica/',
     'https://www.cnnbrasil.com.br/economia/',
     'https://www.cnnbrasil.com.br/internacional/',
@@ -26,28 +24,21 @@ for url in secoes:
     if 'brasil' in secao.lower():
         secao = 'Principal'
 
-    for h3 in soup.find_all('h3'):
-        titulo = h3.get_text(strip=True)
-        if titulo and len(titulo) > 30:  # Filtra títulos curtos demais
+    for a in soup.find_all('a', class_='home__list__tag__link'):
+        link = a.get('href')
+        titulo = a.get_text(strip=True)
+
+        # Filtra links incompletos
+        if link and not link.startswith('http'):
+            link = 'https://www.cnnbrasil.com.br' + link
+
+        if titulo and link and len(titulo) > 20:
             noticias.append({
                 'Título': titulo,
+                'Link': link,
                 'Seção': secao,
                 'Data': datetime.now().strftime('%d/%m/%Y')
             })
 
-# Remove duplicatas
-noticias_unicas = {n['Título']: (n['Seção'], n['Data']) for n in noticias}
-
-with open('noticias_cnn.csv', 'w', encoding='utf-8', newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow(['Título', 'Seção', 'Data'])
-    for titulo, (secao, data) in noticias_unicas.items():
-        writer.writerow([titulo, secao, data])
-
-df_cnn = pd.DataFrame(
-    [{'Título': titulo, 'Seção': secao, 'Data': data} for titulo, (secao, data) in noticias_unicas.items()]
-)
+df_cnn = pd.DataFrame(noticias).drop_duplicates(subset='Título')
 df_cnn.to_csv('noticias_cnn_dataframe.csv', index=False, encoding='utf-8')
-
-print(df_cnn.head())
-print(f'{len(df_cnn)} notícias salvas em "noticias_cnn_dataframe.csv".')
