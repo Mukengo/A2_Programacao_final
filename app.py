@@ -21,7 +21,7 @@ menu = st.sidebar.radio("Escolha uma página:", ['Comparativo Geral', 'UOL', 'G1
 # --- Página Comparativa ---
 if menu == 'Comparativo Geral':
     st.header("📊 Quantidade de Notícias por Site")
-    st.image(img_grafico)
+    st.image(img_grafico, use_container_width=True)
 
     st.markdown("### 🔠 Palavras mais frequentes")
     col1, col2, col3 = st.columns(3)
@@ -44,17 +44,17 @@ if menu == 'Comparativo Geral':
 # --- Página UOL ---
 elif menu == 'UOL':
     st.header("📰 Notícias - UOL")
-    st.image(img_uol, use_column_width=True)
+    st.image(img_uol, use_container_width=True)
     st.dataframe(uol)
 
 # --- Página G1 ---
 elif menu == 'G1':
     st.header("📰 Notícias - G1")
-    st.image(img_g1, use_column_width=True)
+    st.image(img_g1, use_container_width=True)
     st.dataframe(g1)
 
 # --- Página Folha ---
 elif menu == 'Folha':
     st.header("📰 Notícias - Folha")
-    st.image(img_folha, use_column_width=True)
+    st.image(img_folha, use_container_width=True)
     st.dataframe(folha)
