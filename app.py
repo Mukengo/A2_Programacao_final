@@ -2,50 +2,59 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 
-st.set_page_config(layout="wide")
-st.title("📰 Comparador de Notícias - G1, CNN e Folha")
+st.set_page_config(layout='wide')
+st.title("Comparativo de Notícias: UOL, G1 e Folha")
 
-aba = st.selectbox("Escolha o que deseja visualizar", ['Comparativo Geral', 'G1', 'CNN', 'Folha'])
+# --- Carregar dados e imagens ---
+uol = pd.read_csv('dados/noticias_uol_dataframe.csv')
+g1 = pd.read_csv('dados/noticias_g1_dataframe.csv')
+folha = pd.read_csv('dados/noticias_folha_dataframe.csv')
 
-if aba == 'Comparativo Geral':
+img_uol = Image.open('imagens/nuvem_uol.png')
+img_g1 = Image.open('imagens/nuvem_g1.png')
+img_folha = Image.open('imagens/nuvem_folha.png')
+img_grafico = Image.open('imagens/grafico_comparativo.png')
+
+# --- Menu lateral ---
+menu = st.sidebar.radio("Escolha uma página:", ['Comparativo Geral', 'UOL', 'G1', 'Folha'])
+
+# --- Página Comparativa ---
+if menu == 'Comparativo Geral':
     st.header("📊 Quantidade de Notícias por Site")
-    st.image('grafico_quantidade.png')
+    st.image(img_grafico)
 
+    st.markdown("### 🔠 Palavras mais frequentes")
     col1, col2, col3 = st.columns(3)
+
     with col1:
-        st.subheader("🧠 G1")
-        st.image('nuvem_g1.png')
-        st.dataframe(pd.read_csv('top_palavras_g1.csv'))
+        st.subheader("UOL")
+        uol_palavras = pd.read_csv("dados/palavras_uol.csv")
+        st.dataframe(uol_palavras)
+
     with col2:
-        st.subheader("🧠 CNN")
-        st.image('nuvem_cnn.png')
-        st.dataframe(pd.read_csv('top_palavras_cnn.csv'))
+        st.subheader("G1")
+        g1_palavras = pd.read_csv("dados/palavras_g1.csv")
+        st.dataframe(g1_palavras)
+
     with col3:
-        st.subheader("🧠 Folha")
-        st.image('nuvem_folha.png')
-        st.dataframe(pd.read_csv('top_palavras_folha.csv'))
+        st.subheader("Folha")
+        folha_palavras = pd.read_csv("dados/palavras_folha.csv")
+        st.dataframe(folha_palavras)
 
-else:
-    nome_site = aba
-    nome_arquivo = nome_site.lower()
+# --- Página UOL ---
+elif menu == 'UOL':
+    st.header("📰 Notícias - UOL")
+    st.image(img_uol, use_column_width=True)
+    st.dataframe(uol)
 
-    st.header(f"📰 Notícias do {nome_site}")
-    df = pd.read_csv(f'noticias_{nome_arquivo}_dataframe.csv')
+# --- Página G1 ---
+elif menu == 'G1':
+    st.header("📰 Notícias - G1")
+    st.image(img_g1, use_column_width=True)
+    st.dataframe(g1)
 
-# Cria link clicável em HTML
-def transformar_em_link(row):
-    return f'<a href="{row["Link"]}" target="_blank">{row["Título"]}</a>'
-
-df['Título com Link'] = df.apply(transformar_em_link, axis=1)
-
-# Mostra a tabela com link
-st.write("Clique no título para acessar a notícia:")
-st.write(df[['Título com Link', 'Seção', 'Data']].to_html(escape=False, index=False), unsafe_allow_html=True)
-
-
-    st.subheader("☁️ Nuvem de Palavras")
-    st.image(f'nuvem_{nome_arquivo}.png')
-
-    st.subheader("🔝 Principais Palavras")
-    df_top = pd.read_csv(f'top_palavras_{nome_arquivo}.csv')
-    st.dataframe(df_top)
+# --- Página Folha ---
+elif menu == 'Folha':
+    st.header("📰 Notícias - Folha")
+    st.image(img_folha, use_column_width=True)
+    st.dataframe(folha)
